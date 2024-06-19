@@ -8,6 +8,7 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
 	github.com/technoweenie/multipartstreamer v1.0.1 // indirect
 	github.com/xanzy/go-gitlab v0.105.0 // indirect
