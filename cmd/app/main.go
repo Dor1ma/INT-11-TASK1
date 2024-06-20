@@ -1,8 +1,8 @@
 package main
 
 import (
-	"INT-11-TASK1/internal/entity"
-	"INT-11-TASK1/internal/telegram"
+	"github.com/Dor1ma/INT-11-TASK1/internal/entity"
+	"github.com/Dor1ma/INT-11-TASK1/internal/telegram"
 	"github.com/robfig/cron/v3"
 	"log"
 )

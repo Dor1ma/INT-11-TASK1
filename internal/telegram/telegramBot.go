@@ -1,8 +1,8 @@
 package telegram
 
 import (
-	"INT-11-TASK1/internal/entity"
 	"fmt"
+	"github.com/Dor1ma/INT-11-TASK1/internal/entity"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/xanzy/go-gitlab"
 	"log"
@@ -30,23 +30,23 @@ func SendTelegramMessage(bot *tgbotapi.BotAPI, chatID int64, message string) {
 	}
 }
 
-func HandleSetProjectCommand(message *tgbotapi.Message, config *entity.Config, bot *tgbotapi.BotAPI) {
+func HandleChangeProjectCommand(message *tgbotapi.Message, config *entity.Config, bot *tgbotapi.BotAPI) {
 	args := message.CommandArguments()
 	if args == "" {
-		SendTelegramMessage(bot, message.Chat.ID, "Please provide a project ID")
+		SendTelegramMessage(bot, message.Chat.ID, "Пожалуйста, укажите project ID вместе с командой")
 		return
 	}
 
 	config.GitlabProjectID = args
-	SendTelegramMessage(bot, message.Chat.ID, "Project ID updated: "+config.GitlabProjectID)
+	SendTelegramMessage(bot, message.Chat.ID, "Project ID обновлен: "+config.GitlabProjectID)
 }
 
 func HandleHelpCommand(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
-	helpMessage := "Available commands:\n" +
-		"/set_project <projectID> - Set the GitLab project ID\n" +
-		"/check - Manually check for merge requests\n" +
-		"/help - Show this help message\n" +
-		"/start - Starting the bot"
+	helpMessage := "Доступные команды:\n" +
+		"/change_project <projectID> - Изменение GitLab project ID\n" +
+		"/check - Принудительная проверка новых Merge Request'ов\n" +
+		"/help - Вывод описания команд\n" +
+		"/start - Запуск бота"
 	SendTelegramMessage(bot, message.Chat.ID, helpMessage)
 }
 
@@ -54,7 +54,8 @@ func HandleStartCommand(message *tgbotapi.Message, botCtx *BotContext, bot *tgbo
 	botCtx.Lock()
 	defer botCtx.Unlock()
 	botCtx.ChatID = message.Chat.ID
-	SendTelegramMessage(bot, message.Chat.ID, "Hello! You have successfully started the bot")
+	SendTelegramMessage(bot, message.Chat.ID, "Привет! Бот успешно запущен!\n"+
+		"Со списком команд вы можете ознакомиться, использовав команду /help")
 }
 
 func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *entity.Config, botCtx *BotContext) {
@@ -74,14 +75,14 @@ func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *ent
 		switch update.Message.Command() {
 		case "start":
 			HandleStartCommand(update.Message, botCtx, bot)
-		case "set_project":
-			HandleSetProjectCommand(update.Message, config, bot)
+		case "change_project":
+			HandleChangeProjectCommand(update.Message, config, bot)
 		case "check":
 			CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID, true)
 		case "help":
 			HandleHelpCommand(update.Message, bot)
 		default:
-			SendTelegramMessage(bot, update.Message.Chat.ID, "Unknown command")
+			SendTelegramMessage(bot, update.Message.Chat.ID, "Неизвестная команда")
 		}
 	}
 }

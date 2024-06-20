@@ -57,17 +57,17 @@ func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *BotCon
 	}
 
 	if len(newMRs) > 0 {
-		fullMessage := "You have new Merge Requests:\n" + strings.Join(newMRs, "\n\n")
+		fullMessage := "У вас есть новые Merge Request'ы:\n" + strings.Join(newMRs, "\n\n")
 		log.Printf("Sending message: %s", fullMessage)
 		SendTelegramMessage(bot, botCtx.ChatID, fullMessage)
 	}
 
 	if len(unresolvedMRs) > 0 {
-		fullMessage := "You have unresolved Merge Requests:\n" + strings.Join(unresolvedMRs, "\n\n")
+		fullMessage := "У вас есть нерешенные Merge Request'ы:\n" + strings.Join(unresolvedMRs, "\n\n")
 		log.Printf("Sending message: %s", fullMessage)
 		SendTelegramMessage(bot, botCtx.ChatID, fullMessage)
 	} else if forceCheck && len(newMRs) == 0 {
-		SendTelegramMessage(bot, botCtx.ChatID, "There are no new Merge Requests for this project")
+		SendTelegramMessage(bot, botCtx.ChatID, "На текущий момент у этого проекта нет Merge Request'ов")
 	}
 
 	for iid := range notifiedMRs {
