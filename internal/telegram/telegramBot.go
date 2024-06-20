@@ -33,7 +33,7 @@ func SendTelegramMessage(bot *tgbotapi.BotAPI, chatID int64, message string) {
 func HandleSetProjectCommand(message *tgbotapi.Message, config *entity.Config, bot *tgbotapi.BotAPI) {
 	args := message.CommandArguments()
 	if args == "" {
-		SendTelegramMessage(bot, message.Chat.ID, "Please provide a project ID.")
+		SendTelegramMessage(bot, message.Chat.ID, "Please provide a project ID")
 		return
 	}
 
@@ -54,7 +54,7 @@ func HandleStartCommand(message *tgbotapi.Message, botCtx *BotContext, bot *tgbo
 	botCtx.Lock()
 	defer botCtx.Unlock()
 	botCtx.ChatID = message.Chat.ID
-	SendTelegramMessage(bot, message.Chat.ID, "Hello! You have successfully started the bot.")
+	SendTelegramMessage(bot, message.Chat.ID, "Hello! You have successfully started the bot")
 }
 
 func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *entity.Config, botCtx *BotContext) {
@@ -77,11 +77,11 @@ func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *ent
 		case "set_project":
 			HandleSetProjectCommand(update.Message, config, bot)
 		case "check":
-			CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)
+			CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID, true)
 		case "help":
 			HandleHelpCommand(update.Message, bot)
 		default:
-			SendTelegramMessage(bot, update.Message.Chat.ID, "I don't know that command")
+			SendTelegramMessage(bot, update.Message.Chat.ID, "Unknown command")
 		}
 	}
 }

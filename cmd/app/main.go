@@ -29,7 +29,7 @@ func main() {
 	c := cron.New()
 	_, err = c.AddFunc(config.ReminderFrequency, func() {
 		log.Println("Cron job started.")
-		telegram.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)
+		telegram.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID, false)
 		log.Println("Cron job finished.")
 	})
 	if err != nil {
