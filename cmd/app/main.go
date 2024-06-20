@@ -2,7 +2,6 @@ package main
 
 import (
 	"INT-11-TASK1/internal/entity"
-	"INT-11-TASK1/internal/gitlab"
 	"INT-11-TASK1/internal/telegram"
 	"github.com/robfig/cron"
 	"log"
@@ -15,7 +14,7 @@ func main() {
 		return
 	}
 
-	git, err := gitlab.CreateGitlabClient(config.GitlabToken)
+	git, err := telegram.CreateGitlabClient(config.GitlabToken)
 	if err != nil {
 		log.Fatalf("Failed to create GitLab client: %v", err)
 	}
@@ -28,7 +27,7 @@ func main() {
 	botCtx := &telegram.BotContext{}
 
 	c := cron.New()
-	err = c.AddFunc(config.ReminderFrequency, func() { gitlab.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID) })
+	err = c.AddFunc(config.ReminderFrequency, func() { telegram.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID) })
 	if err != nil {
 		return
 	}

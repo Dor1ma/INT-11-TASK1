@@ -1,7 +1,6 @@
-package gitlab
+package telegram
 
 import (
-	telegram "INT-11-TASK1/internal/telegram"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/xanzy/go-gitlab"
@@ -17,7 +16,7 @@ func CreateGitlabClient(token string) (*gitlab.Client, error) {
 	return client, nil
 }
 
-func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *telegram.BotContext, projectID string) {
+func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *BotContext, projectID string) {
 	pID, err := strconv.Atoi(projectID)
 	if err != nil {
 		log.Printf("Invalid project ID: %v", err)
@@ -42,6 +41,6 @@ func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *telegr
 
 	for _, mr := range mergeRequests {
 		message := fmt.Sprintf("Новый Merge Request:\nTitle: %s\nURL: %s", mr.Title, mr.WebURL)
-		telegram.SendTelegramMessage(bot, botCtx.ChatID, message)
+		SendTelegramMessage(bot, botCtx.ChatID, message)
 	}
 }

@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"INT-11-TASK1/internal/entity"
-	gitlabutils "INT-11-TASK1/internal/gitlab"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/xanzy/go-gitlab"
@@ -78,7 +77,7 @@ func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *ent
 		case "setproject":
 			HandleSetProjectCommand(update.Message, config, bot)
 		case "check":
-			gitlabutils.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)
+			CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)
 		case "help":
 			HandleHelpCommand(update.Message, bot)
 		default:
