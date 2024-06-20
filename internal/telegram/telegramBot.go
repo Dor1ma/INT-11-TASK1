@@ -43,7 +43,7 @@ func HandleSetProjectCommand(message *tgbotapi.Message, config *entity.Config, b
 
 func HandleHelpCommand(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
 	helpMessage := "Available commands:\n" +
-		"/setproject <projectID> - Set the GitLab project ID\n" +
+		"/set_project <projectID> - Set the GitLab project ID\n" +
 		"/check - Manually check for merge requests\n" +
 		"/help - Show this help message\n" +
 		"/start - Starting the bot"
@@ -74,7 +74,7 @@ func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *ent
 		switch update.Message.Command() {
 		case "start":
 			HandleStartCommand(update.Message, botCtx, bot)
-		case "setproject":
+		case "set_project":
 			HandleSetProjectCommand(update.Message, config, bot)
 		case "check":
 			CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)

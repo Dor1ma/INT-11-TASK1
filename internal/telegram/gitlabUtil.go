@@ -17,6 +17,7 @@ func CreateGitlabClient(token string) (*gitlab.Client, error) {
 }
 
 func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *BotContext, projectID string) {
+	log.Println("Starting check for new merge requests...")
 	pID, err := strconv.Atoi(projectID)
 	if err != nil {
 		log.Printf("Invalid project ID: %v", err)
@@ -41,6 +42,8 @@ func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *BotCon
 
 	for _, mr := range mergeRequests {
 		message := fmt.Sprintf("Новый Merge Request:\nTitle: %s\nURL: %s", mr.Title, mr.WebURL)
+		log.Printf("Sending message: %s", message)
 		SendTelegramMessage(bot, botCtx.ChatID, message)
 	}
+	log.Println("Finished checking for merge requests.")
 }
