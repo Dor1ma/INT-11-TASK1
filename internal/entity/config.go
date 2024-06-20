@@ -4,14 +4,12 @@ import (
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
-	"strconv"
 )
 
 type Config struct {
 	GitlabToken       string
 	GitlabProjectID   string
 	TelegramBotToken  string
-	TelegramChatID    int64
 	ReminderFrequency string
 }
 
@@ -21,16 +19,10 @@ func LoadConfig() (*Config, error) {
 		return nil, err
 	}
 
-	telegramChatID, err := strconv.ParseInt(os.Getenv("TELEGRAM_CHAT_ID"), 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("invalid TELEGRAM_CHAT_ID: %w", err)
-	}
-
 	config := &Config{
 		GitlabToken:       os.Getenv("GITLAB_TOKEN"),
 		GitlabProjectID:   os.Getenv("GITLAB_PROJECT_ID"),
 		TelegramBotToken:  os.Getenv("TELEGRAM_BOT_TOKEN"),
-		TelegramChatID:    telegramChatID,
 		ReminderFrequency: os.Getenv("REMINDER_FREQUENCY"),
 	}
 

@@ -1,7 +1,7 @@
 package gitlab
 
 import (
-	"INT-11-TASK1/internal/telegram"
+	telegram "INT-11-TASK1/internal/telegram"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/xanzy/go-gitlab"
@@ -17,10 +17,10 @@ func CreateGitlabClient(token string) (*gitlab.Client, error) {
 	return client, nil
 }
 
-func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, chatID int64, projectID string) {
+func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *telegram.BotContext, projectID string) {
 	pID, err := strconv.Atoi(projectID)
 	if err != nil {
-		log.Printf("Invalid project id %v", err)
+		log.Printf("Invalid project ID: %v", err)
 		return
 	}
 
@@ -28,12 +28,20 @@ func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, chatID int64, 
 		State: gitlab.String("opened"),
 	})
 	if err != nil {
-		log.Printf("Failed to list project merge requests: %v", err)
+		log.Printf("Failed to list merge requests: %v", err)
+		return
+	}
+
+	botCtx.Lock()
+	defer botCtx.Unlock()
+
+	if botCtx.ChatID == 0 {
+		log.Printf("Chat ID is not set. Cannot send messages.")
 		return
 	}
 
 	for _, mr := range mergeRequests {
 		message := fmt.Sprintf("Новый Merge Request:\nTitle: %s\nURL: %s", mr.Title, mr.WebURL)
-		telegram.SendTelegramMessage(bot, chatID, message)
+		telegram.SendTelegramMessage(bot, botCtx.ChatID, message)
 	}
 }

@@ -7,7 +7,13 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/xanzy/go-gitlab"
 	"log"
+	"sync"
 )
+
+type BotContext struct {
+	sync.Mutex
+	ChatID int64
+}
 
 func CreateTelegramBot(token string) (*tgbotapi.BotAPI, error) {
 	bot, err := tgbotapi.NewBotAPI(token)
@@ -36,7 +42,23 @@ func HandleSetProjectCommand(message *tgbotapi.Message, config *entity.Config, b
 	SendTelegramMessage(bot, message.Chat.ID, "Project ID updated: "+config.GitlabProjectID)
 }
 
-func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *entity.Config) {
+func HandleHelpCommand(message *tgbotapi.Message, bot *tgbotapi.BotAPI) {
+	helpMessage := "Available commands:\n" +
+		"/setproject <projectID> - Set the GitLab project ID\n" +
+		"/check - Manually check for merge requests\n" +
+		"/help - Show this help message\n" +
+		"/start - Starting the bot"
+	SendTelegramMessage(bot, message.Chat.ID, helpMessage)
+}
+
+func HandleStartCommand(message *tgbotapi.Message, botCtx *BotContext, bot *tgbotapi.BotAPI) {
+	botCtx.Lock()
+	defer botCtx.Unlock()
+	botCtx.ChatID = message.Chat.ID
+	SendTelegramMessage(bot, message.Chat.ID, "Hello! You have successfully started the bot.")
+}
+
+func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *entity.Config, botCtx *BotContext) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
 
@@ -51,12 +73,16 @@ func HandleTelegramUpdates(bot *tgbotapi.BotAPI, git *gitlab.Client, config *ent
 		}
 
 		switch update.Message.Command() {
+		case "start":
+			HandleStartCommand(update.Message, botCtx, bot)
 		case "setproject":
 			HandleSetProjectCommand(update.Message, config, bot)
 		case "check":
-			gitlabutils.CheckMergeRequests(git, bot, config.TelegramChatID, config.GitlabProjectID)
+			gitlabutils.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID)
+		case "help":
+			HandleHelpCommand(update.Message, bot)
 		default:
-			SendTelegramMessage(bot, update.Message.Chat.ID, "Unknown command: "+update.Message.Command())
+			SendTelegramMessage(bot, update.Message.Chat.ID, "I don't know that command")
 		}
 	}
 }

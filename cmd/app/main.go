@@ -25,9 +25,14 @@ func main() {
 		log.Fatalf("Failed to create Telegram bot: %v", err)
 	}
 
+	botCtx := &telegram.BotContext{}
+
 	c := cron.New()
-	c.AddFunc(config.ReminderFrequency, func() { gitlab.CheckMergeRequests(git, bot, config.TelegramChatID, config.GitlabProjectID) })
+	err = c.AddFunc(config.ReminderFrequency, func() { gitlab.CheckMergeRequests(git, bot, botCtx, config.GitlabProjectID) })
+	if err != nil {
+		return
+	}
 	c.Start()
 
-	telegram.HandleTelegramUpdates(bot, git, config)
+	telegram.HandleTelegramUpdates(bot, git, config, botCtx)
 }
