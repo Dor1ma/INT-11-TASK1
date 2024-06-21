@@ -27,6 +27,31 @@ func CheckMergeRequests(git *gitlab.Client, bot *tgbotapi.BotAPI, botCtx *BotCon
 		return
 	}
 
+	user, _, err := git.Users.CurrentUser()
+	if err != nil {
+		log.Printf("Failed to get current user: %v", err)
+		return
+	}
+
+	isMaintainer := false
+	members, _, err := git.ProjectMembers.ListAllProjectMembers(pID, &gitlab.ListProjectMembersOptions{})
+	if err != nil {
+		log.Printf("Failed to list project members: %v", err)
+		return
+	}
+
+	for _, member := range members {
+		if member.ID == user.ID && member.AccessLevel >= gitlab.MaintainerPermissions {
+			isMaintainer = true
+			break
+		}
+	}
+
+	if !isMaintainer {
+		SendTelegramMessage(bot, botCtx.ChatID, "Ваш Access Token не является токеном для роли Maintainer")
+		return
+	}
+
 	mergeRequests, _, err := git.MergeRequests.ListProjectMergeRequests(pID, &gitlab.ListProjectMergeRequestsOptions{
 		State: gitlab.String("opened"),
 	})
